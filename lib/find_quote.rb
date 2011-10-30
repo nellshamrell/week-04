@@ -21,7 +21,35 @@ def find_quote(file_name,line_number=rand())
   quote = text[line_number].chomp
 end
 
-def search_for_quote(file_name,search_criteria)
+def search_for_quote(search_hash)
+  search_array = *search_hash
+  file_name = search_array[0][1] 
   results = []
+  search_crit_array = search_array[1]
   return results unless File.exist?(file_name)
+  if search_crit_array.nil?
+    File.open(file_name) do |f|
+      f.each do |line|
+        line.chomp!
+        results << line
+      end
+     end
+    return results
+  end
+
+  search_by = search_crit_array[0]
+  search_for = search_crit_array[1]
+  File.open(file_name) do |f|
+    f.each do |line|
+      line.chomp!
+      if search_by == :include
+        results << line if line.include? search_for
+      elsif search_by == :start_with
+        results << line if line.start_with? search_for
+      elsif search_by == :end_with
+        results << line if line.end_with? search_for
+      end
+    end 
+  end
+  return results
 end
